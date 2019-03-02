@@ -1,0 +1,16 @@
+{
+  "name": "beatsajer",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "2.7.3"
+  },
+  "dependencies": {
+    "create-react-class": "^15.6.3",
+    "file-saver": "^2.0.1",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "rxjs": "^6.4.0",
+    "waveform-data": "^2.1.2"
+  }
+}
