@@ -29,9 +29,9 @@
 
 (defn fetch-song [songname]
   (let [ch (chan)]
-    (go (let [response (<! (http/get (str "/songs/" songname ".json") {:as :json}))]
+    (go (let [response (<! (http/get (str "songs/" songname ".json") {:as :json}))]
           (let [song (as-> (:body response) a)
-                a (<! (audio/fetch-audio (str "/songs/" songname ".ogg")))
+                a (<! (audio/fetch-audio (str "songs/" songname ".ogg")))
                 package {:song song
                          :audio (:howl a)
                          :waveform (:waveform a)

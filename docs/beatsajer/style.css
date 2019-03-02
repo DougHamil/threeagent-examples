@@ -1,0 +1,127 @@
+body {
+		padding:0;
+		background-color:#000000;
+		margin:0;
+}
+
+#root {
+		padding:0;
+		margin:0;
+}
+
+#ui-root {
+		font-family:'Roboto', sans-serif;
+		position:fixed;
+		top:0;
+		left:0;
+		background-color:rgba(50, 50, 50, 0.5);
+		width:200px;
+		padding:20px;
+		border-radius:4px;
+		color:#88BBBB;
+}
+
+hr {
+		display:block;
+		height:1px;
+		padding:0;
+		margin:0;
+		border:0;
+		border-top:1px solid #88BBBB;
+}
+
+h3 {
+		font-variant: small-caps;
+		margin:0;
+}
+
+button {
+		font-variant: small-caps;
+		cursor: pointer;
+		color:#88BBBB;
+		font-family: 'Roboto', sans-serif;
+		font-size:18px;
+		background-color: rgba(10, 10, 10, 0.04);
+		border-radius: 5px;
+		border:solid 1px #88BBBB;
+		margin:2px;
+		padding:4px;
+}
+
+button:disabled {
+		color:#555;
+		border-color:#555;
+}
+
+input[type=range] {
+-webkit-appearance: none;
+width: 100%;
+background: transparent;
+height:36px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+	-webkit-appearance:none;
+	border: 1px solid #88BBBB;
+	height:24px;
+	width:16px;
+	border-radius:3px;
+	background:rgba(200,255,255,0.2);
+	cursor:pointer;
+	margin-top:-14px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+width: 100%;
+height: 1px;
+cursor: pointer;
+background: #88BBBB;
+border-radius: 1.3px;
+border: 2px solid #88BBBB;
+}
+
+input[type=range]:focus {
+	outline:none;
+}
+
+.controls-panel {
+		font-size:14px;
+		margin:4px 0 4px 0;
+}
+
+.key-hint {
+		font-size:12px;
+		display:inline-block;
+		background-color:#88BBBB;
+		border-radius:4px;
+		padding:1px 3px 1px 3px;
+		margin-right:3px;
+		color:#333;
+}
+
+.debug-panel {
+		font-size:14px;
+		margin:4px 0 4px 0;
+}
+.song-selection-dialog {
+		background-color: rgba(50, 50, 50, 0.8);
+		position: fixed;
+		top:50%;
+		left: 50%;
+		margin-top: -250px;
+		margin-left: -250px;
+		width:500px;
+		padding:20px;
+}
+
+.song-selection-dialog div {
+		margin:2px;
+}
+
+.group-container {
+		background-color:rgba(50, 50, 50, 0.8);
+		padding:10px;
+		border-radius:5px;
+		margin:4px;
+		text-align:center;
+}

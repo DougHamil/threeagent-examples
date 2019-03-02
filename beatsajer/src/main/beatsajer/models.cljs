@@ -26,19 +26,19 @@
 
 (defn init []
   (let [loader (js/THREE.GLTFLoader.)]
-    (.load loader "/models/block.glb" #(init-model-pool! "block" % 100))
-    (.load loader "/models/bomb.glb" #(init-model-pool! "bomb" % 100))
-    (.load loader "/models/block_highlight.glb" #(init-model-pool! "block-highlight" % 100))
-    (.load loader "/models/logo.glb" (fn [m]
-                                       (let [children (.-children (.-scene m))
-                                             mesh1 (aget children 0)
-                                             mesh2 (aget children 1)
-                                             mat1 (new js/THREE.MeshPhongMaterial (clj->js {:color "red"}))
-                                             mat2 (new js/THREE.MeshPhongMaterial (clj->js {:color "blue"}))
-                                             obj (new js/THREE.Object3D)]
-                                         (set! (.-material mesh1) mat1)
-                                         (set! (.-material mesh2) mat2)
-                                         (.add obj mesh1)
-                                         (.add obj mesh2)
-                                         (swap! state assoc :logo-model obj))))))
+    (.load loader "models/block.glb" #(init-model-pool! "block" % 100))
+    (.load loader "models/bomb.glb" #(init-model-pool! "bomb" % 100))
+    (.load loader "models/block_highlight.glb" #(init-model-pool! "block-highlight" % 100))
+    (.load loader "models/logo.glb" (fn [m]
+                                        (let [children (.-children (.-scene m))
+                                              mesh1 (aget children 0)
+                                              mesh2 (aget children 1)
+                                              mat1 (new js/THREE.MeshPhongMaterial (clj->js {:color "red"}))
+                                              mat2 (new js/THREE.MeshPhongMaterial (clj->js {:color "blue"}))
+                                              obj (new js/THREE.Object3D)]
+                                          (set! (.-material mesh1) mat1)
+                                          (set! (.-material mesh2) mat2)
+                                          (.add obj mesh1)
+                                          (.add obj mesh2)
+                                          (swap! state assoc :logo-model obj))))))
 
