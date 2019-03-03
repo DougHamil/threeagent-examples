@@ -4,6 +4,7 @@ body {
 		margin:0;
 		overflow-x:hidden;
 		overflow-y:hidden;
+		width:100%;
 }
 
 #root {
@@ -56,10 +57,10 @@ button:disabled {
 }
 
 input[type=range] {
--webkit-appearance: none;
-width: 100%;
-background: transparent;
-height:36px;
+	-webkit-appearance: none;
+	width: 100%;
+	background: transparent;
+	height:36px;
 }
 
 input[type=range]::-webkit-slider-thumb {
@@ -127,3 +128,14 @@ input[type=range]:focus {
 		margin:4px;
 		text-align:center;
 }
+
+#footer {
+		font-family:'Roboto', sans-serif;
+		background-color:#AAA;
+		position:fixed;
+		left:0;
+		bottom:0;
+		width:100%;
+		padding:10px;
+		text-align:left;
+}	

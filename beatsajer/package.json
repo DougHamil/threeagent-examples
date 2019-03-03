@@ -6,7 +6,7 @@
     "shadow-cljs": "2.7.3"
   },
 	"scripts": {
-			"release": "shadow-cljs release app && cp ./public/js/main.js ../docs/beatsajer/js/main.js"
+			"release": "shadow-cljs release app && cp ./public/js/main.js ../docs/beatsajer/js/main.js && cp ./public/index.html ../docs/beatsajer/index.html && cp ./public/style.css ../docs/beatsajer/style.css"
 	},
   "dependencies": {
     "create-react-class": "^15.6.3",
