@@ -4,7 +4,6 @@
             [beatsajer.models :as models]
             [beatsajer.music.waveform :as waveform]
             [beatsajer.track :refer [units-per-beat]]
-            [beatsajer.util.core :refer [$ $!]]
             [beatsajer.util.threejs :as threejs]
             [threeagent.alpha.core :as th]))
 
@@ -22,11 +21,11 @@
                        (dec line-layer)
                        0]
             :scale [0.6 0.6 0.6]}
-   (when-let [model (models/checkout-model "block")]
-     (let [material ($ model "material")]
-       ($! material "color" (threejs/color 1 1 1))
-       ($! material "transparent" true)
-       ($! material "opacity" grid-highlight-opacity)
+   (when-let [model ^js (models/checkout-model "block")]
+     (let [material (.-material model)]
+       (set! (.-color material) (threejs/color 1 1 1))
+       (set! (.-transparent material) true)
+       (set! (.-opacity material) grid-highlight-opacity)
        ^{:key (.-uuid model)
          :on-removed #(models/return-model "block" model)}
        [:instance {:object model}]))])
@@ -154,7 +153,7 @@
 
 (defn pick-grid-point [raycaster]
   (when *grid-collision-obj*
-    (when-let [intersection (first (.intersectObject raycaster *grid-collision-obj* true))]
+    (when-let [intersection ^js (first ^js (.intersectObject raycaster *grid-collision-obj* true))]
       (let [point (.-uv intersection)
             x (.-x point)
             y (.-y point)]

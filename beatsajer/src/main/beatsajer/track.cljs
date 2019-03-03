@@ -4,7 +4,7 @@
             [beatsajer.music.audio :as audio]
             [beatsajer.state :refer [state]]
             [beatsajer.util.threejs :as threejs]
-            [beatsajer.util.core :refer [$ $! log]]
+            [beatsajer.util.core :refer [log]]
             [beatsajer.util.math :refer [pi-over-4]]))
 
 (defonce ^:dynamic *block-objects* (js/Map.))
@@ -36,19 +36,19 @@
         (- (* ratio close-distance) close-distance)))))
 
 (defn- get-block-model [index]
-  (when-let [model (models/checkout-model "block")]
-    (let [material ($ model "material")]
-      ($! model "block-index" index)
-      ($! material "transparent" true)
-      ($! material "opacity" 1.0)
+  (when-let [model ^js (models/checkout-model "block")]
+    (let [material (.-material model)]
+      (set! (.-blockIndex model) index)
+      (set! (.-transparent material) true)
+      (set! (.-opacity material) 1.0)
       model)))
 
 (defn- get-bomb-model [index]
-  (when-let [model (models/checkout-model "bomb")]
-    (let [material ($ model "material")]
-      ($! model "block-index" index)
-      ($! material "transparent" true)
-      ($! material "opacity" 1.0)
+  (when-let [model ^js (models/checkout-model "bomb")]
+    (let [material (.-material model)]
+      (set! (.-blockIndex model) index)
+      (set! (.-transparent material) true)
+      (set! (.-opacity material) 1.0)
       model)))
 
 (defn- on-block-added [block-index obj]
@@ -58,10 +58,10 @@
   (.delete *block-objects* block-index)
   (models/return-model type model))
 
-(defn- set-block-color [block-model color opacity]
-  (let [material ($ block-model "material")]
-    ($! material "color" (threejs/color color))
-    ($! material "opacity" opacity)))
+(defn- set-block-color [^js block-model color opacity]
+  (let [material (.-material block-model)]
+    (set! (.-color material) (threejs/color color))
+    (set! (.-opacity material) opacity)))
 
 (defn- block-model [index _type opacity is-selected]
   (let [highlight-model (models/checkout-model "block-highlight")

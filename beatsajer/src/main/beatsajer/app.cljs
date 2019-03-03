@@ -5,7 +5,7 @@
             [beatsajer.music.audio :as audio]
             [beatsajer.editor.core :as editor]
             [beatsajer.menu.core :as menu]
-            [beatsajer.util.core :refer [$ $! log]]
+            [beatsajer.util.core :refer [log]]
             [beatsajer.state :refer [state]]
             [beatsajer.track :as track]
             [beatsajer.util.threejs :as threejs]
@@ -63,17 +63,17 @@
 (defn- reset-post-processing []
   (let [scene (:scene @state)
         camera (:camera @state)
-        composer ($ scene "composer")
+        composer ^js (.-composer scene)
         bloom-effect (new js/POSTPROCESSING.BloomEffect (clj->js {:resolutionScale 0.5
                                                                   :distinction 1.0}))
-        render-pass (new js/POSTPROCESSING.RenderPass ($ scene "scene-root") camera)
+        render-pass (new js/POSTPROCESSING.RenderPass ^js (.-sceneRoot scene) camera)
         effect-pass (new js/POSTPROCESSING.EffectPass camera bloom-effect)]
-    (doseq [pass ($ composer "passes")]
+    (doseq [pass (.-passes composer)]
       (.removePass composer pass))
     (.reset composer)
-    ($! render-pass "clear" true)
-    ($! render-pass "renderToScreen" false)
-    ($! effect-pass "renderToScreen" true)
+    (set! (.-clear render-pass) true)
+    (set! (.-renderToScreen render-pass) false)
+    (set! (.-renderToScreen effect-pass) true)
     (.addPass composer render-pass)
     (.addPass composer effect-pass)))
 
@@ -81,11 +81,11 @@
   (let [scene (th/render [root]
                          (.getElementById js/document "root")
                          {:on-before-render tick})
-        renderer ($ scene "renderer")]
+        renderer ^js (.-renderer scene)]
     (.setClearColor renderer (threejs/color 0.0 0.0 0.0))
     (swap! state assoc :world-scale [0.8 0.8 0.8])
     (swap! state assoc :scene scene)
-    (swap! state assoc :camera (.-camera scene))
+    (swap! state assoc :camera (.-camera ^js scene))
     (reset-post-processing)))
 
 (defn init []

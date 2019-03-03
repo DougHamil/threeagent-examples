@@ -1,6 +1,6 @@
 (ns beatsajer.music.audio
   (:require-macros [cljs.core.async.macros :refer [go]])
-  (:require [beatsajer.util.core :refer [$ $! log]]
+  (:require [beatsajer.util.core :refer [log]]
             [beatsajer.state :refer [state]]
             [cljs.core.async :refer [<! chan put!]]
             ["waveform-data/webaudio" :as webaudio-builder]))
@@ -36,13 +36,13 @@
               (partial buffer->waveform-and-audio c))))
     c))
 
-(defn toggle-paused [audio]
+(defn toggle-paused [^js audio]
   (when audio
     (if (.playing audio)
       (.pause audio)
       (.play audio))))
 
-(defn toggle-mute [audio]
+(defn toggle-mute [^js audio]
   (when audio
     (.mute audio (not (.mute audio)))))
 

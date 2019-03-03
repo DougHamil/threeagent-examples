@@ -8,7 +8,7 @@
             [beatsajer.music.audio :as audio]))
 
 (defn play-song! [package]
-  (when-let [audio (:audio @state)]
+  (when-let [^js audio (:audio @state)]
     (.stop audio)
     (.unload audio)
     (.unload js/Howler))

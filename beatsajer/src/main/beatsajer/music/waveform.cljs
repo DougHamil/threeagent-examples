@@ -1,5 +1,5 @@
 (ns beatsajer.music.waveform
-  (:require [beatsajer.util.core :refer [log $ $!]]
+  (:require [beatsajer.util.core :refer [log]]
             [beatsajer.state :refer [state]]
             [beatsajer.track :refer [units-per-beat]]
             [threeagent.alpha.core :as th]))
@@ -60,7 +60,7 @@
           (fill-tile-column buffer i 0 tile-pixel-height 0 0 0)
           (fill-tile-column buffer i min-up-to max-up-to color-r color-g (+ 195 (rand-int 50)))))
       (catch js/Error e)) ; Read past the waveform buffer...
-    (set! (.-needsUpdate (:texture tile)) true)))
+    (set! (.-needsUpdate ^js (:texture tile)) true)))
   
 (defn generate-waveform [waveform song]
   (when waveform 

@@ -6,7 +6,8 @@
             [beatsajer.music.core :as music]
             [beatsajer.music.audio :as audio]
             [file-saver]
-            [beatsajer.util.core :refer [$ $! log]]))
+            [beatsajer.util.core :refer [log]]))
+
 (defn- load-sample-song []
   (swap! state assoc :song-loading? true)
   (go
@@ -148,7 +149,6 @@
      [song-selection-dialog])])
 
 (defn on-key-up [evt]
-  (log evt)
   (case (.-key evt)
     " " (do
           (toggle-pause)

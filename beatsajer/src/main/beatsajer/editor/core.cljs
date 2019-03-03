@@ -1,11 +1,13 @@
 (ns beatsajer.editor.core
   (:require [beatsajer.state :refer [state]]
-            [beatsajer.util.core :refer [$ log]]
+            [beatsajer.util.core :refer [log]]
             [beatsajer.util.math :as math]
             [beatsajer.util.threejs :as threejs]
             [beatsajer.editor.grid :as grid]
             [beatsajer.track :as track]
             [threeagent.alpha.core :as th]))
+
+(set! *warn-on-infer* true)
 
 (defonce ^:private ^:dynamic *canvas-element* nil)
 (defonce ^:private mouse-wheel-scale 0.01)
@@ -68,9 +70,9 @@
 
 (defn- pick-block [raycaster]
   (let [blocks (.from js/Array (.values track/*block-objects*))]
-    (when-let [intersection (first (.intersectObjects raycaster blocks))]
+    (when-let [intersection ^js (first ^js (.intersectObjects raycaster blocks))]
       {:object (.-object intersection)
-       :block-index ($ (.-object intersection) "block-index")})))
+       :block-index (.-blockIndex (.-object intersection))})))
 
 (defn- get-selected-beat []
   (if-let [pointed-at-block (:pointed-at-block @state)]
@@ -124,7 +126,7 @@
       (swap! state assoc :pointed-at-beat (first (filter #(= (:index %) (:block-index picked-block))
                                                           (get-in @state [:song :_notes]))))
       (swap! state assoc :pointed-at-block picked-block))
-    (if-let [grid-point (grid/pick-grid-point mouse-raycaster)]
+    (when-let [grid-point (grid/pick-grid-point mouse-raycaster)]
       (swap! state assoc :pointed-at-grid-point grid-point))))
 
 (defn- update-selected! []
@@ -225,10 +227,10 @@
 (defn init []
   (set! *canvas-element* (.getElementById js/document "root"))
   (.addEventListener js/window "mousemove" on-mouse-move false)
+  (.addEventListener js/window "keyup" on-key-up false)
+  (.addEventListener js/window "keydown" on-key-down false)
   (doto (.getElementById js/document "root")
     (.addEventListener "wheel" on-mouse-wheel (clj->js {:passive false}))
-    (.addEventListener "keyup" on-key-up false)
-    (.addEventListener "keydown" on-key-down false)
     (.addEventListener "mousedown" on-mouse-down false)
     (.addEventListener "mouseup" on-mouse-up false)
     (.addEventListener "contextmenu" #(.preventDefault %))))
