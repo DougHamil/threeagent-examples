@@ -62,5 +62,5 @@
 
 (defn init []
   (let [loader (js/THREE.FontLoader.)]
-    (.load loader "/fonts/helvetiker.json" on-font-loaded)))
+    (.load loader "fonts/helvetiker.json" on-font-loaded)))
 

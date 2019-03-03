@@ -5,6 +5,9 @@
   "devDependencies": {
     "shadow-cljs": "2.7.3"
   },
+	"scripts": {
+			"release": "shadow-cljs release app && cp ./public/js/main.js ../docs/beatsajer/js/main.js"
+	},
   "dependencies": {
     "create-react-class": "^15.6.3",
     "react": "^16.5.2",
