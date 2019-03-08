@@ -1,0 +1,16 @@
+{
+  "name": "threeagent-example-pong",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "2.7.3"
+  },
+	"scripts": {
+			"release": "shadow-cljs release app && cp ./public/js/main.js ../docs/pong/js/main.js && cp ./public/index.html ../docs/pong/index.html"
+	},
+  "dependencies": {
+    "create-react-class": "^15.6.3",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
+  }
+}
