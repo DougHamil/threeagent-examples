@@ -11,6 +11,5 @@
   :nrepl {:port 7888}
 
   :builds {:app {:target :browser
-                 :compiler-options {:infer-externs :auto}
                  :modules {:main {:init-fn pong.app/init}}
                  :devtools {:http-root "public" :http-port 8080}}}}

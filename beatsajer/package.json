@@ -5,14 +5,17 @@
   "devDependencies": {
     "shadow-cljs": "2.7.3"
   },
-	"scripts": {
-			"release": "shadow-cljs release app && cp ./public/js/main.js ../docs/beatsajer/js/main.js && cp ./public/index.html ../docs/beatsajer/index.html && cp ./public/style.css ../docs/beatsajer/style.css"
-	},
+  "scripts": {
+    "release": "shadow-cljs release app && cp ./public/js/main.js ../docs/beatsajer/js/main.js && cp ./public/index.html ../docs/beatsajer/index.html && cp ./public/style.css ../docs/beatsajer/style.css"
+  },
   "dependencies": {
     "create-react-class": "^15.6.3",
+    "postprocessing": "^6.0.1",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "rxjs": "^6.4.0",
+    "three": "^0.102.1",
+    "three-gltf-loader": "^1.102.0",
     "waveform-data": "^2.1.2"
   }
 }

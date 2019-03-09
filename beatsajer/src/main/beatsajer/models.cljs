@@ -1,6 +1,8 @@
 (ns beatsajer.models
   (:require [beatsajer.util.core :refer [log]]
             [beatsajer.state :refer [state]]
+            ["three" :as three]
+            ["three-gltf-loader" :as gltfloader]
             [threeagent.alpha.core :as th]))
 
 (defonce ^:dynamic ^:private *model-pools* (js/Map.))
@@ -25,7 +27,7 @@
     (.set *model-pools* key pool)))
 
 (defn init []
-  (let [loader (js/THREE.GLTFLoader.)]
+  (let [loader (new gltfloader)]
     (.load loader "models/block.glb" #(init-model-pool! "block" % 100))
     (.load loader "models/bomb.glb" #(init-model-pool! "bomb" % 100))
     (.load loader "models/block_highlight.glb" #(init-model-pool! "block-highlight" % 100))
@@ -33,9 +35,9 @@
                                         (let [children (.-children (.-scene m))
                                               mesh1 (aget children 0)
                                               mesh2 (aget children 1)
-                                              mat1 (new js/THREE.MeshPhongMaterial (clj->js {:color "red"}))
-                                              mat2 (new js/THREE.MeshPhongMaterial (clj->js {:color "blue"}))
-                                              obj (new js/THREE.Object3D)]
+                                              mat1 (new three/MeshPhongMaterial (clj->js {:color "red"}))
+                                              mat2 (new three/MeshPhongMaterial (clj->js {:color "blue"}))
+                                              obj (new three/Object3D)]
                                           (set! (.-material ^js mesh1) mat1)
                                           (set! (.-material ^js mesh2) mat2)
                                           (.add obj mesh1)

@@ -5,12 +5,13 @@
   "devDependencies": {
     "shadow-cljs": "2.7.3"
   },
-	"scripts": {
-			"release": "shadow-cljs release app && cp ./public/js/main.js ../docs/pong/js/main.js && cp ./public/index.html ../docs/pong/index.html"
-	},
+  "scripts": {
+    "release": "shadow-cljs release app && cp ./public/js/main.js ../docs/pong/js/main.js && cp ./public/index.html ../docs/pong/index.html"
+  },
   "dependencies": {
     "create-react-class": "^15.6.3",
     "react": "^16.5.2",
-    "react-dom": "^16.5.2"
+    "react-dom": "^16.5.2",
+    "three": "^0.102.1"
   }
 }

@@ -1,7 +1,8 @@
 (ns beatsajer.text-3d
   (:require [threeagent.alpha.core :as th]
             [beatsajer.util.core :refer [log]]
-            [beatsajer.state :refer [state]]))
+            [beatsajer.state :refer [state]]
+            ["three" :as three]))
 
 (defonce ^:private pool-size 40)
 (defonce ^:dynamic ^:private *digits* (js/Map.))
@@ -28,13 +29,13 @@
       [digit d]])])
 
 (defn- new-text-geometry [text cfg]
-  (new js/THREE.TextGeometry text (clj->js cfg)))
+  (new three/TextGeometry text (clj->js cfg)))
 
 (defn- new-mesh [geo material]
-  (new js/THREE.Mesh geo material))
+  (new three/Mesh geo material))
 
 (defn- new-mesh-material []
-  (new js/THREE.MeshPhongMaterial (clj->js {})))
+  (new three/MeshPhongMaterial (clj->js {})))
 
 (defn- on-font-loaded [font]
   (swap! state assoc :font font)
@@ -61,6 +62,6 @@
       (.set *digits* sym pool))))
 
 (defn init []
-  (let [loader (js/THREE.FontLoader.)]
+  (let [loader (new three/FontLoader)]
     (.load loader "fonts/helvetiker.json" on-font-loaded)))
 

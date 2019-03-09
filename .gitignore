@@ -5,6 +5,10 @@ beatsajer/public/js/test
 beatsajer/public/js/cljs-runtime
 beatsajer/public/js/manifest.edn
 beatsajer/public/songs
+pong/public/js/main.js
+pong/public/js/test
+pong/public/js/cljs-runtime
+pong/public/js/manifest.edn
 
 /target
 /checkouts

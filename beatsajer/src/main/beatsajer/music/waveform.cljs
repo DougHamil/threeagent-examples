@@ -2,6 +2,7 @@
   (:require [beatsajer.util.core :refer [log]]
             [beatsajer.state :refer [state]]
             [beatsajer.track :refer [units-per-beat]]
+            ["three" :as three]
             [threeagent.alpha.core :as th]))
  
 (defonce ^:private TILES (array))
@@ -18,14 +19,14 @@
     (.ceil js/Math (/ total-pixels pixels-per-tile))))
 
 (defn- new-tile-mesh [texture]
-  (let [geo (new js/THREE.PlaneGeometry 1 1 1 1)
-        mat (new js/THREE.MeshBasicMaterial (clj->js {:map texture}))]
-    (new js/THREE.Mesh geo mat)))
+  (let [geo (new three/PlaneGeometry 1 1 1 1)
+        mat (new three/MeshBasicMaterial (clj->js {:map texture}))]
+    (new three/Mesh geo mat)))
 
 (defn- new-tile []
   (let [size (* tile-pixel-width tile-pixel-height)
         buffer (new js/Uint8Array (* 3 size))
-        texture (new js/THREE.DataTexture buffer tile-pixel-width tile-pixel-height js/THREE.RGBFormat)]
+        texture (new three/DataTexture buffer tile-pixel-width tile-pixel-height three/RGBFormat)]
     {:texture-buffer buffer
      :image-size size
      :texture texture

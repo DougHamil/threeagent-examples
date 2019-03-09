@@ -9,6 +9,7 @@
             [beatsajer.state :refer [state]]
             [beatsajer.track :as track]
             [beatsajer.util.threejs :as threejs]
+            ["postprocessing" :as postprocessing]
             [threeagent.alpha.core :as th]))
 
 (defn logo []
@@ -61,13 +62,15 @@
   (track/tick delta-time))
 
 (defn- reset-post-processing []
-  (let [scene (:scene @state)
+  (let [scene ^js (:scene @state)
         camera (:camera @state)
-        composer ^js (.-composer scene)
-        bloom-effect (new js/POSTPROCESSING.BloomEffect (clj->js {:resolutionScale 0.5
+        renderer ^js (.-renderer scene)
+        composer (new postprocessing/EffectComposer renderer)
+        bloom-effect (new postprocessing/BloomEffect (clj->js {:resolutionScale 0.5
                                                                   :distinction 1.0}))
-        render-pass (new js/POSTPROCESSING.RenderPass ^js (.-sceneRoot scene) camera)
-        effect-pass (new js/POSTPROCESSING.EffectPass camera bloom-effect)]
+        render-pass (new postprocessing/RenderPass ^js (.-sceneRoot scene) camera)
+        effect-pass (new postprocessing/EffectPass camera bloom-effect)]
+    (set! (.-composer scene) composer)
     (doseq [pass (.-passes composer)]
       (.removePass composer pass))
     (.reset composer)
