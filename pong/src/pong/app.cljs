@@ -15,7 +15,6 @@
                          :ball-position [0 0]}))
 (def world-scale 1.0)
 
-
 (defn paddle [side]
   (let [[x-pos y-pos] @(th/cursor state [:paddle side :position])
         height @(th/cursor state [:paddle side :height])]
@@ -157,18 +156,18 @@
     (str "Player 2: " @(r/cursor state [:points :right]))]])
 
 (defn init []
-  (let [scene (th/render [root]
-                         (.getElementById js/document "root")
-                         {:on-before-render tick
-                          :ortho-camera? false})]
-    (swap! state assoc :scene scene)
-    (.addEventListener js/window "keydown" on-keydown)
-    (.addEventListener js/window "keyup" on-keyup))
+  (th/render [root]
+             (.getElementById js/document "root")
+             {:on-before-render tick})
+  (.addEventListener js/window "keydown" on-keydown)
+  (.addEventListener js/window "keyup" on-keyup)
   (r/render [ui-root]
             (.getElementById js/document "ui-root")))
 
 (defn ^:dev/after-load reload []
-  (th/reload-scene (:scene @state) root {:on-before-render tick})
+  (th/render [root]
+             (.getElementById js/document "root")
+             {:on-before-render tick})
   (r/render [ui-root]
             (.getElementById js/document "ui-root")))
 

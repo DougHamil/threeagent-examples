@@ -62,15 +62,15 @@
   (track/tick delta-time))
 
 (defn- reset-post-processing []
-  (let [scene ^js (:scene @state)
+  (let [scene-context ^js (:scene-context @state)
         camera (:camera @state)
-        renderer ^js (.-renderer scene)
+        renderer ^js (.-renderer scene-context)
         composer (new postprocessing/EffectComposer renderer)
         bloom-effect (new postprocessing/BloomEffect (clj->js {:resolutionScale 0.5
                                                                   :distinction 1.0}))
-        render-pass (new postprocessing/RenderPass ^js (.-sceneRoot scene) camera)
+        render-pass (new postprocessing/RenderPass ^js (.-sceneRoot scene-context) camera)
         effect-pass (new postprocessing/EffectPass camera bloom-effect)]
-    (set! (.-composer scene) composer)
+    (set! (.-composer scene-context) composer)
     (doseq [pass (.-passes composer)]
       (.removePass composer pass))
     (.reset composer)
@@ -81,14 +81,12 @@
     (.addPass composer effect-pass)))
 
 (defn load-scene! []
-  (let [scene (th/render [root]
-                         (.getElementById js/document "root")
-                         {:on-before-render tick})
-        renderer ^js (.-renderer scene)]
-    (.setClearColor renderer (threejs/color 0.0 0.0 0.0))
+  (let [scene-context (th/render [root]
+                                 (.getElementById js/document "root")
+                                 {:on-before-render tick})]
     (swap! state assoc :world-scale [0.8 0.8 0.8])
-    (swap! state assoc :scene scene)
-    (swap! state assoc :camera (.-camera ^js scene))
+    (swap! state assoc :scene-context scene-context)
+    (swap! state assoc :camera (.-camera ^js scene-context))
     (reset-post-processing)))
 
 (defn init []
@@ -100,5 +98,7 @@
   (audio/init))
 
 (defn ^:dev/after-load after-load []
-  (th/reload-scene (:scene @state) root {:on-before-render tick})
+  (th/render [root]
+             (.getElementById js/document "root")
+             {:on-before-render tick})
   (reset-post-processing))

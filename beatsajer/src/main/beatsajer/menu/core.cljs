@@ -24,11 +24,10 @@
           (music/play-song! song)))))
 
 (defn- save-song []
-  (let [song (:song @state)
-        song (update song :_notes (fn [ns]
-                                    (map #(dissoc % :index) ns)))
-        song (assoc song :_obstacles [])
-        song (assoc song :_events [])
+  (let [song (-> (:song @state)
+                 (update :_notes (fn [ns] (map #(dissoc % :index) ns)))
+                 (update :_obstacles #(or % []))
+                 (update :_events #(or % [])))
         blob (js/Blob. [(.stringify js/JSON (clj->js song))]
                        (clj->js {:type "text/plain;charset=utf-8"}))]
     (file-saver/saveAs blob "track.json")))
