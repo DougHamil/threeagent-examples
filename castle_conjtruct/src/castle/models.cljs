@@ -11,13 +11,17 @@
                                    "wall-corner" "models/wallCorner.glb"})
 (defonce ^:private models (js/Map.))
 
+(defn- enable-shadows! [o]
+  (set! (.-castShadow o) true)
+  (set! (.-receiveShadow o) true)
+  (doseq [c (.-children o)]
+    (enable-shadows! c)))
+
 (defcomponent :model [{:keys [type]}]
   (let [source-model (.get models type)
         clone (.clone source-model)
         first-child (aget (.-children clone) 0)]
-    (set! (.-castShadow clone) true)
-    (set! (.-receiveShadow clone) true)
-    (set! (.-castShadow first-child) true)
+    (enable-shadows! clone)
     (.set (.-position first-child) 0 0 0)
     clone))
 

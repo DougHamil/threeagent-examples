@@ -7,45 +7,58 @@
   (:require-macros [cljs.core.async :refer [go]]))
 
 (defonce state (th/atom {:time 0}))
+(defn log [v] (.log js/console v))
 
-(def directional-light (new three/DirectionalLight 0xFFFFFF 1.8))
+(def directional-light (new three/DirectionalLight 0xFFFFFF 1.0))
+
 (set! (.-castShadow directional-light) true)
-(.set (.-position (.-target directional-light)) 0 0 -10)
+(.set (.-position (.-target directional-light)) 20 -10 1)
 (set! (.-enabled (.-shadow directional-light)) true)
 (let [shadow (.-shadow directional-light)]
-  (set! (.-bias shadow) 0.0001))
+  (set! (.-bias shadow) 0.0001)
+  (set! (.-x (.-mapSize shadow)) 1024)
+  (set! (.-y (.-mapSize shadow)) 1024))
 (let [shadow-cam (.-camera (.-shadow directional-light))]
-  (set! (.-near shadow-cam) 4)
-  (set! (.-far shadow-cam) 5000))
-(def cam-helper (new three/CameraHelper (.-camera (.-shadow directional-light))))
+  (set! (.-near shadow-cam) 1)
+  (set! (.-left shadow-cam) -10)
+  (set! (.-bottom shadow-cam) -10)
+  (set! (.-right shadow-cam) 10)
+  (set! (.-top shadow-cam) 10)
+  (set! (.-far shadow-cam) 400))
 
-(defn wall-segment [[x1 y1] [x2 y2]]
+(defn wall-segment [length include-corners?]
   [:object
-   (if (= y2 y1)
-     (for [x (range x1 (inc x2))]
-       [:model {:type "wall"
+   (for [i (range length)]
+     (let [model-type (if (and include-corners? (or (= 0 i)
+                                                    (= (dec length) i)))
+                        "wall-corner"
+                        "wall")]
+       [:model {:type model-type
                 :rotation [0 (/ js/Math.PI -2.0) 0]
-                :position [(* 10.0 x) 0 (* 10.0 y1)]}])
-     (for [y (range y1 (inc y2))]
-       [:model {:type "wall"
-                :rotation [0 0 0]
-                :position [(* 10.0 x1) 0 (* 10.0 y)]}]))])
+                :position [(* 10.0 i) 0 0]}]))])
 
 (defn castle []
   [:object {:scale [0.1 0.1 0.1]
+            :rotation [0 @(th/cursor state [:time]) 0]
             :position [0 -4 0]}
-   [:model {:type "gate"}]
-   [:model {:type "bridge"}]
-   [wall-segment [0 0] [5 0]]
-   [wall-segment [0 -5] [5 -5]]
-   [wall-segment [-1 -7] [-1 0]]
-   [wall-segment [5 -5] [5 0]]])
+   [:object {:position [10 0 0]}
+    [wall-segment 3 false]]
+   [:object {:rotation [0 (/ js/Math.PI 2.0) 0]
+             :position [0 0 10]}
+    [wall-segment 5 true]]
+   [:object {:rotation [0 (/ js/Math.PI 2.0) 0]
+             :position [40 0 10]}
+    [wall-segment 5 true]]
+   [:object {:rotation [0 0 0]
+             :position [10 0 -40]}
+    [wall-segment 3 false]]])
 
 (defn lights []
-  [:object {:position [(* 2.0 (.sin js/Math @(th/cursor state [:time])))
-                       0 0]}
+  [:object
+   [:hemisphere-light {:intensity 0.3}]
+   ^{:on-added #(.add directional-light (.-target directional-light))}
    [:instance {:object directional-light
-               :position [0 2 0]}]])
+               :position [-10 2 -8]}]])
 
 (defn ground []
   [:object
@@ -53,15 +66,19 @@
      (for [y (range 15)]
       ^{:on-added #(do (set! (.-receiveShadow %) true)
                        (set! (.-castShadow %) true))}
-      [:box {:position [(- x 5) (+ (rand 0.5) -5) (- y 10)]
-             :material (new three/MeshPhongMaterial 0xBB00BB)}]))])
-(defn root []
-  [:object
-   [:instance {:object cam-helper}]
-   [lights]
+       [:box {:position [(- x 5)
+                         (+ (* (.sin js/Math x) 0.05) -4.5)
+                         (- y 10)]}]))])
+
+(defn scene []
    [:object {:position [0 0 -10]}
     [ground]
-    [castle]]])
+    [castle]])
+
+(defn root []
+  [:object
+   [lights]
+   [scene]])
 
 (defn- tick [delta-time]
   (swap! state update :time + delta-time))
@@ -75,10 +92,10 @@
                            {:on-before-render tick})
         renderer (.-renderer context)
         scene (.-sceneRoot context)]
-    (set! (.-fog scene) (new three/Fog 0xAA88BB 8.0 30.0))
+    (set! (.-fog scene) (new three/Fog 0xAA88BB 9.0 40.0))
     (swap! state assoc :renderer renderer)
     (set! (.-enabled (.-shadowMap renderer)) true)
-    ;;(set! (.-type (.-shadowMap renderer)) three/PCFSoftShadowMap)
+    (set! (.-type (.-shadowMap renderer)) three/PCFSoftShadowMap)
     (.setClearColor renderer 0xAA88BB 1))
   (r/render [ui-root]
             (.getElementById js/document "ui-root")))
