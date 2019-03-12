@@ -1,0 +1,15 @@
+;; shadow-cljs configuration
+{:source-paths ["src"]
+
+  :dependencies
+    [[cider/cider-nrepl "0.20.0"]
+     [doughamil/threeagent "0.0.1-SNAPSHOT"]
+     [cljs-http "0.1.45"]
+     [reagent "0.8.1"]
+     [medley "1.0.0"]]
+
+  :nrepl {:port 7888}
+
+  :builds {:app {:target :browser
+                 :modules {:main {:init-fn castle.app/init}}
+                 :devtools {:http-root "public" :http-port 8080}}}}
