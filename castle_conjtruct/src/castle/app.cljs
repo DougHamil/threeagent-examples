@@ -7,6 +7,9 @@
   (:require-macros [cljs.core.async :refer [go]]))
 
 (defonce state (th/atom {:time 0}))
+(def wall-size 10.0)
+(defonce pi-over-2 (/ js/Math.PI 2.0))
+
 (defn log [v] (.log js/console v))
 
 (def directional-light (new three/DirectionalLight 0xFFFFFF 1.0))
@@ -26,32 +29,39 @@
   (set! (.-top shadow-cam) 10)
   (set! (.-far shadow-cam) 400))
 
-(defn wall-segment [length include-corners?]
+(defn wall-segment [length]
   [:object
    (for [i (range length)]
-     (let [model-type (if (and include-corners? (or (= 0 i)
-                                                    (= (dec length) i)))
-                        "wall-corner"
-                        "wall")]
-       [:model {:type model-type
-                :rotation [0 (/ js/Math.PI -2.0) 0]
-                :position [(* 10.0 i) 0 0]}]))])
+    [:model {:type "wall"
+             :rotation [0 (/ js/Math.PI -2.0) 0]
+             :position [(* 10.0 i) 0 0]}])])
+
+(defn castle-square [width length]
+  [:object
+   [:model {:type "wall-corner"
+            :position [0 0 wall-size]}]
+   [:object {:rotation [0 pi-over-2 0]
+             :position [(* wall-size (dec width)) 0 wall-size]}
+    [:model {:type "wall-corner"
+             :position [(/ wall-size -2.0) 0 (/ wall-size -2.0)]}]]
+   [:object {:position [wall-size 0 0]}
+    [wall-segment (- width 2)]]
+   [:object {:rotation [0 (/ js/Math.PI 2.0) 0]
+             :position [0 0 0]}
+    [wall-segment (- length 2)]]
+   [:object {:rotation [0 (/ js/Math.PI 2.0) 0]
+             :position [(* (dec width) wall-size) 0 0]}
+    [wall-segment (- length 2)]]
+   [:object {:rotation [0 0 0]
+             :position [wall-size 0 (* (dec length) (- wall-size))]}
+    [wall-segment (- width 2)]]])
+
 
 (defn castle []
   [:object {:scale [0.1 0.1 0.1]
             :rotation [0 @(th/cursor state [:time]) 0]
             :position [0 -4 0]}
-   [:object {:position [10 0 0]}
-    [wall-segment 3 false]]
-   [:object {:rotation [0 (/ js/Math.PI 2.0) 0]
-             :position [0 0 10]}
-    [wall-segment 5 true]]
-   [:object {:rotation [0 (/ js/Math.PI 2.0) 0]
-             :position [40 0 10]}
-    [wall-segment 5 true]]
-   [:object {:rotation [0 0 0]
-             :position [10 0 -40]}
-    [wall-segment 3 false]]])
+   [castle-square 5 8]])
 
 (defn lights []
   [:object
