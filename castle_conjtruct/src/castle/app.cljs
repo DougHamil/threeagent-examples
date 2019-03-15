@@ -8,6 +8,7 @@
   (:require-macros [cljs.core.async :refer [go]]))
 
 (defonce state (th/atom {:time 0
+                         :ocean-amplitude 0.1
                          :knight-count 10
                          :castle-length 5
                          :castle-width 5}))
@@ -140,7 +141,7 @@
 
 (defn- tick [delta-time]
   (swap! state update :time + delta-time)
-  (ocean/tick (:time @state)))
+  (ocean/tick (:time @state) (:ocean-amplitude @state)))
 
 (defn- ui-root []
   [:div
@@ -158,7 +159,13 @@
     [:span "Length:"]
     [:input {:type "number"
              :value @(r/cursor state [:castle-length])
-             :on-change #(swap! state assoc :castle-length (-> % .-target .-value js/parseInt))}]]])
+             :on-change #(swap! state assoc :castle-length (-> % .-target .-value js/parseInt))}]]
+   [:div
+    [:span "Ocean Amp:"]
+    [:input {:type "number"
+             :step "0.1"
+             :value @(r/cursor state [:ocean-amplitude])
+             :on-change #(swap! state assoc :ocean-amplitude (-> % .-target .-value js/parseFloat))}]]])
 
 (def sky-color 0xDDDDDD)
 (defn- init-scene []
