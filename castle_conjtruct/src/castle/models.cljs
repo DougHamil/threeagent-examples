@@ -7,6 +7,7 @@
 
 (defonce ^:private models-to-load {"gate" "models/gate.glb"
                                    "bridge" "models/bridge.glb"
+                                   "knight-red" "models/knightRed.glb"
                                    "wall" "models/wall.glb"
                                    "wall-corner" "models/wallCorner.glb"})
 (defonce ^:private models (js/Map.))
