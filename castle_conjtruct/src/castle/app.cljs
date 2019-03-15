@@ -3,6 +3,7 @@
             ["three" :as three]
             [reagent.core :as r]
             [cljs.core.async :refer [chan put! >! <!]]
+            [castle.ocean :as ocean]
             [castle.models :as models])
   (:require-macros [cljs.core.async :refer [go]]))
 
@@ -68,21 +69,6 @@
              :position [wall-size 0 (* (dec length) (- wall-size))]}
     [wall-segment (- width 2)]]])
 
-(defn ocean []
-  (let [time @(th/cursor state [:time])]
-    [:object {:position [-5.0 -4.8 10.0]}
-     [:plane {:position [0 -0.2 0]
-              :scale [200 100 100]
-              :rotation [(* -1.0 pi-over-2) 0 0]
-              :material {:color 0x4488FF}}]
-     (for [x (range 20)]
-       (for [y (range 20)]
-         ^{:on-added #(do (set! (.-receiveShadow %) true))}
-         [:box {:position [x
-                           (* (.sin js/Math (+ y x time)) 0.1)
-                           (- y)]
-                :material {:color 0x4488FF}}]))]))
-
 (defn ground [width length]
   [:object {:position [-1.0 -0.5 2.0]}
    (for [x (range width)]
@@ -113,6 +99,7 @@
                   :rotation [0 (* 2.0 pi-over-2) 0]
                   :position [(* wall-size x) 0 (- (* wall-size y))]}]))]))
 
+
 (defn castle []
   (let [castle-width @(th/cursor state [:castle-width])
         castle-length @(th/cursor state [:castle-length])]
@@ -139,10 +126,11 @@
                   :rotation [(- (* 0.4 pi-over-2)) 0 0]
                   :position [(/ castle-width 2.0) 2 5]}]
       [:object])))
+
 (defn scene []
    [:object 
     [camera]
-    [ocean]
+    [ocean/render]
     [castle]])
 
 (defn root []
@@ -151,7 +139,8 @@
    [scene]])
 
 (defn- tick [delta-time]
-  (swap! state update :time + delta-time))
+  (swap! state update :time + delta-time)
+  (ocean/tick (:time @state)))
 
 (defn- ui-root []
   [:div
@@ -171,6 +160,7 @@
              :value @(r/cursor state [:castle-length])
              :on-change #(swap! state assoc :castle-length (-> % .-target .-value js/parseInt))}]]])
 
+(def sky-color 0xDDDDDD)
 (defn- init-scene []
   (let [context (th/render [root]
                            (.getElementById js/document "root")
@@ -179,10 +169,10 @@
         scene (.-sceneRoot context)]
     (swap! state assoc :renderer renderer)
     (swap! state assoc :camera (.-camera context))
-    (set! (.-fog scene) (new three/Fog 0xAA88BB 9.0 40.0))
+    (set! (.-fog scene) (new three/Fog sky-color 10.0 40.0))
     (set! (.-enabled (.-shadowMap renderer)) true)
     (set! (.-type (.-shadowMap renderer)) three/PCFSoftShadowMap)
-    (.setClearColor renderer 0xAA88BB 1))
+    (.setClearColor renderer sky-color 1))
   (r/render [ui-root]
             (.getElementById js/document "ui-root")))
 (defn init []
