@@ -93,6 +93,15 @@
                          (- y)]
               :material {:color 0x88FF88}}]))])
 
+(defn catapults [width]
+  (let [catapult-count 5]
+    [:object {:scale [0.08 0.08 0.08]
+              :position [0 0 1.7]}
+     (for [i (range catapult-count)]
+       [:model {:type "catapult"
+                :position [(* wall-size (rand width)) 0 0]
+                :rotation [0 (rand 3.14) 0]}])]))
+
 (defn knights [width length]
   (let [knight-count @(th/cursor state [:knight-count])]
     [:object {:scale [0.1 0.1 0.1]
@@ -110,6 +119,7 @@
     [:object {:position [0 -4 0]}
      [ground (+ castle-width 3) (+ castle-length 3)]
      [knights castle-width castle-length]
+     [catapults castle-width]
      [:object {:scale [0.1 0.1 0.1]}
       [castle-square castle-width castle-length]]]))
 
