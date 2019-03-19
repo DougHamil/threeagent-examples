@@ -121,14 +121,15 @@
 
 (defn camera []
   (let [castle-width @(th/cursor state [:castle-width])]
-    (if-let [camera @(th/cursor state [:camera])]
-      [:instance {:object camera
-                  :rotation [(- (* 0.4 pi-over-2)) 0 0]
-                  :position [(/ castle-width 2.0) 2 5]}]
-      [:object])))
+    ^{:on-added #(do (log %))}
+    [:camera {:position [0 1 1]
+              :rotation [castle-width
+                         0
+                         0]}]))
+
 
 (defn scene []
-   [:object 
+  [:object 
     [camera]
     [ocean/render]
     [castle]])
@@ -167,6 +168,7 @@
                            {:on-before-render tick})
         renderer (.-renderer context)
         scene (.-sceneRoot context)]
+    (swap! state assoc :context context)
     (swap! state assoc :renderer renderer)
     (swap! state assoc :camera (.-camera context))
     (set! (.-fog scene) (new three/Fog sky-color 10.0 40.0))
@@ -184,3 +186,6 @@
 
 
 
+
+(comment
+  (log (.-camera (:context @state))))
