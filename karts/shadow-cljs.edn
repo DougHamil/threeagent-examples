@@ -1,0 +1,18 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/main"]
+
+ :dependencies
+ [[cider/cider-nrepl "0.20.0"]
+  [org.clojure/core.async "0.4.490"]
+  [doughamil/threeagent "0.0.1-SNAPSHOT"]]
+
+ :nrepl {:port 7888}
+
+ :builds
+ {:app
+  {:target :browser
+   :modules {:main {:init-fn aoc.app/init}}
+   :devtools
+   {:http-root "public"
+    :http-port 8080}}}}
