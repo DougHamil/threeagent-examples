@@ -121,7 +121,7 @@
     [:object]))
 
 (defn init! []
-  (fetch "/input.txt" (fn [input-txt]
+  (fetch "input.txt" (fn [input-txt]
                         (let [track-map (encode-map (track-text-to-array input-txt true))]
                           (swap! state assoc :track-map track-map)
                           (swap! state assoc :track (track-array-to-instances track-map))
