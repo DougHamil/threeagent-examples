@@ -8,6 +8,7 @@
 (defonce ^:private models-to-load {"gate" "models/gate.glb"
                                    "bridge" "models/bridge.glb"
                                    "catapult" "models/siegeCatapult.glb"
+                                   "king" "models/king.glb"
                                    "knight-red" "models/knightRed.glb"
                                    "wall" "models/wall.glb"
                                    "wall-corner" "models/wallCorner.glb"})

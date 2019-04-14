@@ -6,8 +6,8 @@
 (defonce ^:private offsets (array))
 (defonce ^:private orientations (array))
 (defonce ^:private ^:dynamic *offset-attribute* nil)
-(defonce width 50)
-(defonce length 50)
+(defonce width 100)
+(defonce length 100)
 
 (when (nil? *offset-attribute*)
   (set! (.-index geo) (.-index box-geo))
@@ -42,11 +42,11 @@
               :position [(- (/ width 2.0)) -5.2 (- (- length 4))]}])
 
 (defonce ^:private cur-vec (three/Vector3. 0 0 0))
-(defn tick [time]
+(defn tick [time amplitude]
   (doseq [i (range (.-count *offset-attribute*))]
     (.fromArray cur-vec (.-array *offset-attribute*) (* 3 i))
     (let [x (mod i length)
           y (/ i width)
-          t (* 0.1 (.sin js/Math (+ x y time)))]
+          t (* amplitude (.sin js/Math (+ x y time)))]
       (.setXYZ *offset-attribute* i (.-x cur-vec) t (.-z cur-vec))))
   (set! (.-needsUpdate *offset-attribute*) true))

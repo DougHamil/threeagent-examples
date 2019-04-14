@@ -2,12 +2,24 @@
   (:require [threeagent.alpha.core :as th]
             ["three" :as three]
             [reagent.core :as r]
+            [posh.reagent :refer [pull q posh!]]
             [cljs.core.async :refer [chan put! >! <!]]
+            [datascript.core :as d]
             [castle.ocean :as ocean]
+            [castle.agent :as agent]
             [castle.models :as models])
   (:require-macros [cljs.core.async :refer [go]]))
 
+(defonce schema {:player/id {:db/unique :db.unique/identity}})
+(defonce conn (d/create-conn schema))
+(posh! conn)
+
 (defonce state (th/atom {:time 0
+                         :ocean-amplitude 0.1
+                         :king-agent {:current-position (three/Vector3. 0 0 0)
+                                      :target-position (three/Vector3. 0 0 0)
+                                      :start-position (three/Vector3. 0 0 0)
+                                      :start-time 0}
                          :knight-count 10
                          :castle-length 5
                          :castle-width 5}))
@@ -99,7 +111,6 @@
                   :rotation [0 (* 2.0 pi-over-2) 0]
                   :position [(* wall-size x) 0 (- (* wall-size y))]}]))]))
 
-
 (defn castle []
   (let [castle-width @(th/cursor state [:castle-width])
         castle-length @(th/cursor state [:castle-length])]
@@ -110,29 +121,37 @@
      [:object {:scale [0.1 0.1 0.1]}
       [castle-square castle-width castle-length]]]))
 
-
 (defn lights []
   [:object
    [:hemisphere-light {:intensity 0.3}]
    ^{:on-added #(.add directional-light (.-target directional-light))}
    [:instance {:object directional-light
                :position [-10 2 -8]}]])
-
+(defn king []
+  (let [agent @(th/cursor state [:king-agent])
+        player-color @(pull conn '[:player/color] [:player/id 1])]
+    [:model {:type "king"
+             :position [(.-x (:current-position agent)) -3.2 (.-z (:current-position agent))]
+             :rotation [0 (* 2.0 pi-over-2) 0]
+             :scale [0.1 0.1 0.1]}
+     [:box {:material {:color (or (:player/color player-color) "red")}
+            :scale [10 10 10]}]]))
 
 (defn camera []
   (let [castle-width @(th/cursor state [:castle-width])]
-    ^{:on-added #(do (log %))}
-    [:camera {:position [0 1 1]
-              :rotation [castle-width
-                         0
-                         0]}]))
-
+    [:camera {:fov 90
+              :aspectRatio (/ 16 9)
+              :near 0.1
+              :far 1000
+              :position [(/ castle-width 2.0) 1 4]
+              :rotation [-1.0 0 0]}]))
 
 (defn scene []
   [:object 
-    [camera]
-    [ocean/render]
-    [castle]])
+   [camera]
+   [ocean/render]
+   [castle]
+   [king]])
 
 (defn root []
   [:object
@@ -141,7 +160,8 @@
 
 (defn- tick [delta-time]
   (swap! state update :time + delta-time)
-  (ocean/tick (:time @state)))
+  (ocean/tick (:time @state) (:ocean-amplitude @state))
+  (agent/tick state (+ (:time @state) delta-time)))
 
 (defn- ui-root []
   [:div
@@ -159,7 +179,13 @@
     [:span "Length:"]
     [:input {:type "number"
              :value @(r/cursor state [:castle-length])
-             :on-change #(swap! state assoc :castle-length (-> % .-target .-value js/parseInt))}]]])
+             :on-change #(swap! state assoc :castle-length (-> % .-target .-value js/parseInt))}]]
+   [:div
+    [:span "Ocean Amp:"]
+    [:input {:type "number"
+             :step "0.1"
+             :value @(r/cursor state [:ocean-amplitude])
+             :on-change #(swap! state assoc :ocean-amplitude (-> % .-target .-value js/parseFloat))}]]])
 
 (def sky-color 0xDDDDDD)
 (defn- init-scene []
@@ -184,8 +210,14 @@
 (defn ^:dev/after-load reload []
   (init-scene))
 
-
-
-
 (comment
+  (d/transact! conn [{:player/id 1
+                      :player/color "green"}])
+  (d/transact! conn [{:player/id 1
+                      :player/color "red"}])
+  (let [agent (:king-agent @state)
+        agent (assoc agent :start-time (:time @state))]
+    (.set (:target-position agent) -6 0 0)
+    (.copy (:start-position agent) (:current-position agent))
+    (swap! state assoc :king-agent agent))
   (log (.-camera (:context @state))))
