@@ -7,6 +7,7 @@
             [aoc.kart :as kart]
             [aoc.camera :as camera]
             [aoc.models :as models]
+            [aoc.particles :as particles]
             [aoc.instanced-model :as instanced-model]
             ["three" :as three]
             ["postprocessing" :as postfx])
@@ -27,7 +28,8 @@
 
 (defn- tick! [delta-time]
   (kart/tick! delta-time)
-  (camera/tick! delta-time))
+  (camera/tick! delta-time)
+  (particles/tick! delta-time))
 
 (defn- setup-scene [ctx]
   (swap! state assoc :camera (.-camera ctx))
@@ -37,6 +39,7 @@
   (set! (.-far (.-camera ctx)) 100.0)
   (set! (.-near (.-camera ctx)) 1)
   (.updateProjectionMatrix (.-camera ctx))
+  (particles/init! (.-sceneRoot ctx))
   (when (nil? (.-composer ctx))
     (let [composer (postfx/EffectComposer. (.-renderer ctx))
           camera (.-camera ctx)

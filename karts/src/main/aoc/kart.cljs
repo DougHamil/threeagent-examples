@@ -50,10 +50,19 @@
     [:object
      (for [k karts]
        ^{:key (:id k)}
-       [:model {:type (nth car-models (mod (:index k) (count car-models)))
-                :rotation (:rotation k)
-                :scale [0.7 0.7 0.7]
-                :position (:position k)}])]
+       [:object
+        [:model {:type (nth car-models (mod (:index k) (count car-models)))
+                 :rotation (:rotation k)
+                 :scale [0.7 0.7 0.7]
+                 :position (:position k)}
+          (when (= :crashed (:state k))
+            [:object
+             [:particles {:color 0xEEAA00
+                          :scale [0.5 0.5 0.5]}]
+             [:particles {:color 0x888888
+                          :scale [0.5 1.0 0.5]
+                          :position [0 0.5 0]}]])]])]
+                         
     [:object]))
 
 (defn- index-by-id [karts]
@@ -201,12 +210,18 @@
                              ordered-karts)]
     (sort-by :id (concat (:driving ticked-karts) (:crashed ticked-karts)))))
 
+
 (defn tick! [delta-time]
   (let [{:keys [karts track-map]} @state]
     (when (and karts track-map)
       (let [{:keys [simulation-speed-scale sim-time all-ticks]} @state
+            simulation-speed-scale (if (pos? simulation-speed-scale)
+                                     (.pow js/Math (inc simulation-speed-scale) 10.0)
+                                     (if (neg? simulation-speed-scale)
+                                       (- (.pow js/Math (dec simulation-speed-scale) 10.0))
+                                      0))
             sim-time (or sim-time 0)
-            new-sim-time (+ sim-time (* simulation-speed-scale delta-time))
+            new-sim-time (+ sim-time (* (/ simulation-speed-scale 2.0) delta-time))
             new-sim-tick (int new-sim-time)
             sim-delta (- new-sim-time new-sim-tick)]
         (when (and (>= new-sim-tick 0)

@@ -17,6 +17,7 @@
     "three": "^0.103.0",
     "three-gltf-loader": "^1.103.0",
     "three-instanced-mesh": "^0.96.2",
-    "three-orbitcontrols": "^2.102.1"
+    "three-orbitcontrols": "^2.102.1",
+    "three.proton.js": "^0.1.5"
   }
 }

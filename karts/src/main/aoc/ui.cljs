@@ -28,10 +28,9 @@
                           (swap! postfx-state assoc :focus 1.0)
                           (swap! state assoc :follow-kart-id nil))}]
    [:span "None"]
-   (when-let [karts (sort-by :index @(r/cursor state [:karts]))]
-     (for [kart karts]
-       ^{:key (:id kart)}
-       [kart-selector kart]))])
+   (for [kart @(r/cursor state [:karts])]
+     ^{:key (:id kart)}
+     [kart-selector kart])])
 
 (defn input []
   [:div
@@ -49,13 +48,13 @@
    [:div
     [:label "Speed:"]
     [:input {:type "range"
-             :min "-100"
+             :min "-1"
              :style {:float "right"
                      :width "300px"}
-             :max "100"
-             :step "0.5"
+             :max "1"
+             :step "0.05"
              :value @(r/cursor state [:simulation-speed-scale])
-             :on-change #(swap! state assoc :simulation-speed-scale (js/parseInt (.-value (.-target %))))}]]
+             :on-change #(swap! state assoc :simulation-speed-scale (-> % .-target .-value js/parseFloat))}]]
    [:br]])
     
     
