@@ -2,6 +2,7 @@
   (:require [threeagent.alpha.core :as th]
             [cljs.core.async :refer [chan put! >! <!]]
             [aoc.ui :as ui]
+            [aoc.text-3d :as text-3d]
             [aoc.state :refer [state postfx-state]]
             [aoc.track :as track]
             [aoc.kart :as kart]
@@ -71,6 +72,7 @@
   (go (do
         (<! (instanced-model/init!))
         (<! (models/init!))
+        (<! (text-3d/init!))
         (setup-scene
          (th/render root
                     (.getElementById js/document "root")

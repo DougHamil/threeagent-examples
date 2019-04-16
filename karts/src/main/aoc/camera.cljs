@@ -42,7 +42,7 @@
                               @(th/cursor state [:karts])))
           [x y z] (:position kart)
           cam (:camera @state)]
-      (.set (.-position cam) x (+ y 3.5) (+ z -6))
+      (.set (.-position cam) x (+ y 2.0) (+ z -6))
       (.lookAt cam (three/Vector3. x y z))
       (when-let [orbit (:orbit-controls @state)]
         (set! (.-target orbit) (three/Vector3. x y z))

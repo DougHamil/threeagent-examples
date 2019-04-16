@@ -1,5 +1,6 @@
 (ns aoc.particles
   (:require ["three" :as three]
+            [aoc.state :refer [simulation-speed-multiplier state]]
             [threeagent.alpha.core :as th])
   (:require-macros [threeagent.alpha.macros :refer [defcomponent]]))
 
@@ -7,43 +8,37 @@
   (three/Vector3. x y z))
 
 (defonce ^:dynamic ^:private systems (th/atom {}))
-(defonce ^:dynamic ^:private *pools* (js/Map.))
 
-(defn- create-system [p-count color]
+(defn- create-system [p-count color spawn-time]
   (let [particles (new three/Geometry)
         material (new three/PointsMaterial (clj->js {:color color
-                                                     :opacity 0.8
+                                                     :opacity 0.6
                                                      :transparent true
-                                                     :size 0.3}))
+                                                     :size 0.4}))
         vertices (.-vertices particles)]
     (doseq [i (range p-count)]
-      (let [particle (vec3 [(* 1 (rand 1))
-                            (* 2.5 (rand 1))
-                            (* 1 (rand 1))])]
+      (let [p [(rand 1)
+               0
+               (rand 1)]
+            v [0.01
+               (* 2.5 (rand 1))
+               0.01]
+            particle (vec3 p)]
+        (set! (.-initialPos particle) p)
+        (set! (.-velocity particle) v)
         (.push vertices particle)))
-    (new three/Points particles material)))
+    (let [system (new three/Points particles material)]
+      (set! (.-initialTime system) spawn-time)
+      system)))
 
-(defn- get-free-system [type]
-  (let [pool (.get *pools* type)
-        used-keys (set (keys @systems))]
-    (first (filter #(not (used-keys (.-uuid % ))) pool))))
-
-(defcomponent :particles [{:keys [type color]}]
-  (let [system (create-system 20 color)
+(defcomponent :particles [{:keys [type color spawn-time]}]
+  (let [system (create-system 10 color (:sim-time @state))
         id (.-uuid system)]
     (swap! systems assoc id system)
     (.addEventListener system
                        "on-removed"
                        #(swap! systems dissoc id))
     system))
-
-(defn spawn! [type pos rot]
-  (when-let [system (get-free-system type)]
-    (let [obj {:system system
-               :position pos
-               :rotation rot}]
-      (swap! systems assoc (.-uuid system) obj)
-      system)))
 
 (defn render []
   [:object
@@ -53,22 +48,21 @@
                  :rotation rotation
                  :object system}])])
 
-(defn init! [scene]
-  (comment
-    (.set *pools* "sparks" (clj->js (repeatedly 10 #(create-system 20))))))
-
 (defn tick! [delta-time]
-  (let [vy (* delta-time 1)]
+  (let [dt (* delta-time @simulation-speed-multiplier)
+        sim-time (:sim-time @state)
+        vy (* dt 1)]
     (doseq [system (vals @systems)]
-      (let [geo (.-geometry system)]
+      (let [geo (.-geometry system)
+            spawn-time (.-initialTime system)
+            duration (- sim-time spawn-time)]
         (set! (.-verticesNeedUpdate geo) true)
         (doseq [particle (.-vertices geo)]
           (let [pos particle
-                y (.-y pos)
-                ny (+ y vy)]
-            (set! (.-y pos) (if (< ny 2)
-                              ny
-                              0))))))))
+                [vx vy vz] (.-velocity particle)
+                [ox oy oz] (.-initialPos particle)
+                ny (mod (+ oy (* vy duration)) 2.0)]
+            (.set pos ox ny oz)))))))
 
-(comment
-  (count (vals @systems)))
+
+(defn init! [scene])
