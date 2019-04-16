@@ -21,6 +21,12 @@
 (defn karts []
   [:div
    [:div "Karts"]
+   [:div
+    [:label "Show Crashed?"]
+    [:input {:type "checkbox"
+             :name "show-crashed"
+             :checked @(r/cursor state [:show-crashed?])
+             :on-change #(swap! state assoc :show-crashed? (-> % .-target .-checked))}]]
    [:input {:type "radio"
             :name "follow-kart"
             :checked (nil? @(r/cursor state [:follow-kart-id]))
@@ -28,9 +34,13 @@
                           (swap! postfx-state assoc :focus 1.0)
                           (swap! state assoc :follow-kart-id nil))}]
    [:span "None"]
-   (for [kart @(r/cursor state [:karts])]
-     ^{:key (:id kart)}
-     [kart-selector kart])])
+   (let [karts @(r/cursor state [:karts])
+         show-crashed @(r/cursor state [:show-crashed?])]
+     (for [kart (filter #(or show-crashed
+                             (not= :crashed (:state %)))
+                        karts)]
+       ^{:key (:id kart)}
+       [kart-selector kart]))])
 
 (defn input []
   [:div

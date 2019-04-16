@@ -3,6 +3,7 @@
             [reagent.core :as r]))
 
 (defonce state (th/atom {:track []
+                         :show-crashed? true
                          :simulation-speed-scale 0.0}))
 
 (def simulation-speed-multiplier (r/track (fn []
