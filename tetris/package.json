@@ -1,0 +1,21 @@
+{
+  "name": "tetris",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "2.7.3"
+  },
+  "scripts": {
+    "release": "shadow-cljs release app && cp ./public/js/main.js ../docs/tetris/js/main.js && cp ./public/index.html ../docs/tetris/index.html"
+  },
+  "dependencies": {
+    "@tweenjs/tween.js": "^17.3.0",
+    "create-react-class": "^15.6.3",
+    "postprocessing": "^6.2.1",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "three": "^0.103.0",
+    "three-gltf-loader": "^1.103.0",
+    "three-instanced-mesh": "^0.96.2"
+  }
+}
