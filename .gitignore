@@ -11,6 +11,8 @@ pong/public/js/test
 
 pong/public/js/manifest.edn
 
+vr_editor/public/js/cljs-runtime
+
 /target
 /checkouts
 /src/gen
