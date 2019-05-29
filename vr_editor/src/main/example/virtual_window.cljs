@@ -24,8 +24,7 @@
     (swap! windows update window-id assoc :media-stream stream)
     (.setAttributeNode video (.createAttribute js/document "autoplay"))
     (set! (.-srcObject video) stream)
-    ;; TODO: This is crappy, figure out something better than a timeout
-    (.setTimeout js/window (partial resize-editor-geo! window-id) 2000)))
+    (.addEventListener video "loadedmetadata" (partial resize-editor-geo! window-id))))
 
 (defn- ask-for-media-stream! [window-id]
   (let [p (-> js/navigator .-mediaDevices (.getDisplayMedia (clj->js {:video true})))]
