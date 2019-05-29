@@ -1,0 +1,20 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/dev"
+  "src/main"
+  "src/test"]
+
+ :dependencies
+ [[doughamil/threeagent "0.0.1-SNAPSHOT"]
+  [cljs-http "0.1.45"]
+  [cider/cider-nrepl "0.20.1-SNAPSHOT"]]
+
+ :nrepl {:port 7888}
+
+ :builds
+ {:app
+  {:target :browser
+   :modules {:main {:init-fn example.app/init}}
+   :devtools
+   {:http-root "public"
+    :http-port 8080}}}}

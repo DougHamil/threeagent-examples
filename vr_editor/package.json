@@ -1,0 +1,17 @@
+{
+  "name": "threeagent-vr-editor-example",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "2.7.15"
+  },
+  "scripts": {
+    "release": "shadow-cljs release app && cp ./public/js/main.js ../docs/vr-editor/js/main.js && cp ./public/index.html ../docs/vr-editor/index.html"
+  },
+  "dependencies": {
+    "create-react-class": "^15.6.3",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "three": "^0.103.0"
+  }
+}
