@@ -24,6 +24,7 @@
     (swap! windows update window-id assoc :media-stream stream)
     (.setAttributeNode video (.createAttribute js/document "autoplay"))
     (set! (.-srcObject video) stream)
+    (js/setInterval #(resize-editor-geo! window-id) 0)
     (.addEventListener video "loadedmetadata" (partial resize-editor-geo! window-id))))
 
 (defn- ask-for-media-stream! [window-id]
