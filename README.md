@@ -21,3 +21,8 @@ A visualization of the Advent of Code 2018 Day 13 puzzle
 A simple Tetris clone
 
 [View the example](https://doughamil.github.io/threeagent-examples/tetris/)
+
+## VR Editor
+An example of using the defcomponent macro to embed a virtual window from your desktop in the 3D scene. Allowing you to edit your threeagent scene from within the scene itself.
+
+[View the example](https://doug.hamil.github.io/threeagent-examples/vr-editor/)
