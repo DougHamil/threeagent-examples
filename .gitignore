@@ -2,6 +2,7 @@
 **/.projectile
 **/public/js/cljs-runtime
 beatsajer/public/js/main.js
+beatsajer/public/js/main.js.map
 beatsajer/public/js/test
 beatsajer/public/js/cljs-runtime
 beatsajer/public/js/manifest.edn
@@ -11,6 +12,7 @@ pong/public/js/test
 
 pong/public/js/manifest.edn
 
+vr_editor/public/js/
 vr_editor/public/js/cljs-runtime
 
 /target
