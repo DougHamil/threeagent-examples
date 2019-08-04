@@ -1,0 +1,24 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src"]
+
+ :dependencies
+ [[cider/cider-nrepl "0.20.0"]
+  [org.clojure/core.async "0.4.490"]
+  [doughamil/threeagent "0.0.2-SNAPSHOT"]]
+
+ :nrepl {:port 7888}
+
+ :builds
+ {:app
+  {:target :browser
+   :compiler-options {:infer-externs :auto}
+   :modules {:base {:entries [shadow.cljs.bootstrap.env]}
+             :main {:init-fn physics.app/init
+                    :depends-on #{:base}}
+             :ammo-worker {:entries [physics.worker]
+                           :depends-on #{:base}
+                           :web-worker true}}
+   :devtools
+   {:http-root "public"
+    :http-port 8080}}}}
