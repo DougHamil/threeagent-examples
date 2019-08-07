@@ -1,0 +1,21 @@
+{
+  "name": "golf",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "shadow-cljs": "2.8.42"
+  },
+  "scripts": {
+    "release": "npx shadow-cljs release app bootstrap && cp ./public/js/main.js ../docs/golf/js/main.js && cp -r ./public/js/bootstrap ../docs/golf/js && cp ./public/index.html ../docs/golf/index.html && cp ./public/js/ammo.js ../docs/golf/js/ammo.js && cp ./public/js/base.js ../docs/golf/js/base.js && cp ./public/js/ammo-worker.js ../docs/golf/js/ammo-worker.js && cp ./public/js/codemirror.js ../docs/golf/js/codemirror.js && cp ./public/js/codemirror.css ../docs/golf/js/codemirror.css && cp ./public/js/clojure_mode.js ../docs/golf/js/clojure_mode.js"
+  },
+  "dependencies": {
+    "@tweenjs/tween.js": "^17.3.0",
+    "create-react-class": "^15.6.3",
+    "postprocessing": "^6.2.1",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "three": "^0.107.0",
+    "three-gltf-loader": "^1.103.0",
+    "three-instanced-mesh": "^0.96.2"
+  }
+}
