@@ -1,21 +1,25 @@
 (ns physics.app
   (:require [threeagent.core :as th]
             ["three" :as three]
+            ["three/examples/jsm/vr/WebVR" :as webvr]
             [physics.sim :as sim]
             [physics.instanced :as instanced]
+            [physics.virtual-window]
             [cljs.core.async :refer [<!]])
   (:require-macros [cljs.core.async.macros :refer [go]]
                    [threeagent.macros :refer [defcomponent]]))
 
-(defonce state (th/atom {}))
 
-(def sky-color 0x9999FF)
+(defonce state (th/atom {:wall-width 10}))
+
+(def sky-color 0x8890FF)
 
 (defcomponent :physics-body [{:keys [body]}]
-  (let [o (three/Object3D.)
-        on-added-fn (fn this-fn []
-                      (sim/register-body body o))]
-    (.addEventListener o "on-added" on-added-fn)
+  (let [o (three/Object3D.)]
+    (.addEventListener o "on-added" (fn []
+                                      (sim/register-body body o)))
+    (.addEventListener o "on-removed" (fn []
+                                        (sim/unregister-body o)))
     o))
 
 (defn block [width height depth mass]
@@ -24,31 +28,31 @@
               :size [(/ width s)
                      (/ height s)
                      (/ depth s)]
-              :friction 50
-              :restitution 0.00
+              :friction 5.5
+              :restitution 0.0
               :mass mass}]
     [:physics-body {:body body}
      ^{:on-added (fn [o]
                    (set! (.-castShadow o) true)
                    (set! (.-receiveShadow o) true))}
      [:instanced-box {:scale [width height depth]
-                      :color 0xFFEE22
-                      :material {:color 0xFFEE22}}]]))
+                      :color 0xFFEE22}]]))
 
 (defn ball [radius]
   (let [s 1.0
         body {:shape "sphere"
               :radius (/ radius s)
-              :mass 90.0
-              :friction 20.0
-              :rollingFriction 2000.0}]
+              :mass 90.1
+              :friction 0.05
+              :restitution 0.2
+              :rollingFriction 0.0}]
     [:physics-body {:body body}
      ^{:on-added (fn [o]
                    (set! (.-castShadow o) true)
                    (set! (.-receiveShadow o) true))}
      [:sphere {:radius radius
-               :width-segments 12
-               :height-segments 12
+               :width-segments 18
+               :height-segments 18
                :material {:color 0xFF7722}}]]))
 
 (defn wall [height width block-size mass]
@@ -56,11 +60,17 @@
    (let [padding 0.0001]
      (for [y (range height)]
        (for [x (range width)]
-         [:object {:position [0
-                              (* (+ padding block-size) y)
-                              (- (* (+ padding block-size) x)
-                                 (/ (* width block-size) 2.0))]}
-          [block block-size block-size block-size mass]])))])
+         (let [r (- 1.0 (/ y height))
+               s (* (* r r)
+                    block-size)
+               ;s block-size
+               m (+ 1.0 (* r mass))]
+           [:object {:position [0
+                                (* (+ padding block-size) y)
+                                (- (* (+ padding s) x)
+                                   (/ (* width s) 2.0))]}
+            [block s s s m]]))))])
+
 
 (defn castle [block-size size height mass]
   [:object
@@ -85,14 +95,52 @@
                         0]}
     [wall height size block-size mass]]])
 
+(defn tower [block-size radius c segments]
+  [:object
+   (for [i (range c)]
+     (for [x (range segments)]
+       (let [r (/ x segments)
+             a (* (* 2.0 js/Math.PI) r)]
+         [:object {:position [(* radius (js/Math.cos a))
+                              (* block-size i)
+                              (* radius (js/Math.sin a))]}
+          [block block-size block-size block-size 0.5]])))])
+
 (defn blocks []
   [:object
    [:object {:position [-39 50 0]}
-    [ball 3.0]]
+    [ball 2.5]]
    [:object {:position [-42 -1.5 0]
              :rotation [0 0.0 1.2]}
     [block 10 20 20 0]]
-   [castle 1.0 20 5 0.001]])
+   (comment
+     (let [size @(th/cursor state [:wall-width])]
+       [castle 1.5 size 15 10.001]))
+   (comment
+     (for [i (range 5)]
+       [:object {:position [(* i -4) 0 0]}
+        [wall 20 10 2.0 0.01]]))
+   [tower 1.0 5.0 10 25]])
+
+(defn- vrand [v]
+  (* v (js/Math.random)))
+
+(defn clouds []
+  [:object {:position [0 9 -90]}
+   (for [i (range 8)]
+     [:object {:position [(- (vrand 80)
+                             40)
+                          (vrand 8) (vrand 2)]}
+      (for [j (range 3)]
+        [:sphere {:material {:color "white"
+                             :emissive (three/Color. 0xFFFFFF)
+                             :specular 0}
+                  :radius (+ 2.0 (vrand 2.0))
+                  :height-segments 18
+                  :width-segments 18
+                  :position [(vrand 8)
+                             (vrand 5)
+                             (vrand 1)]}])])])
 
 (defn lighting []
   [:object
@@ -102,7 +150,7 @@
     ^{:on-added (fn [o]
                   (set! (.-castShadow o) true)
                   (let [c (.-camera (.-shadow o))
-                        d 50]
+                        d 40]
                     (set! (.-width (.-mapSize (.-shadow o))) 2048)
                     (set! (.-height (.-mapSize (.-shadow o))) 2048)
                     (set! (.-right c) d)
@@ -132,13 +180,18 @@
                     (.-width canvas))
           width 50
           height (* width aspect)]
-      [:orthographic-camera {:position [0 35 40]
+      [:object
+       [:perspective-camera {:position [0 35 40]
                              :rotation [-0.5 0 0]
-                             :left (- width)
-                             :right width
-                             :top height
-                             :bottom (- height)
-                             :active true}])
+                             :aspect (/ 1.0 aspect)
+                             :active true}]
+       [:orthographic-camera {:position [0 35 40]
+                              :rotation [-0.5 0 0]
+                              :left (- width)
+                              :right width
+                              :top height
+                              :bottom (- height)
+                              :active true}]])
     [:object]))
 
 (defn root []
@@ -146,10 +199,13 @@
    [camera]
    [lighting]
    [ground]
-   [:object {:position [0 0 -20]}
-    (for [i (range 1)]
-      [:object {:position [0 0 (* -2.1 i)]}
-       [blocks]])]])
+   (comment
+     [:virtual-window {:position [-0.5 1.0 -0.8]
+                       :scale [0.8 0.8 0.8]
+                       :rotation [0.2 0.0 0]
+                       :opacity 0.8}])
+   [:object {:position [0 0 -5]}
+    [blocks]]])
 
 
 (defn tick! [delta-time])
@@ -161,12 +217,18 @@
                                     (.getElementById js/document "root")
                                     {:on-before-render tick!})
                      renderer (.-renderer ctx)]
+                 (.setPixelRatio renderer  (.-devicePixelRatio js/window))
+                 (.setSize renderer (.-innerWidth js/window) (.-innerHeight js/window))
                  (swap! state assoc :canvas (.-canvas ctx))
                  (set! (.-enabled (.-shadowMap renderer)) true)
                  (sim/init-scene! (.-sceneRoot ctx))
                  (instanced/init-scene! (.-sceneRoot ctx))
-                 (js/console.log (.-sceneRoot ctx))
-                 (.setClearColor renderer sky-color)))))
+                 (.setClearColor renderer sky-color)
+                 (comment
+                   (set! (.-enabled (.-vr renderer)) true)
+                   (.setFramebufferScaleFactor (.-vr renderer) 1.2)
+                   (.appendChild (.-body js/document)
+                                 (.createButton (.-WEBVR webvr) renderer)))))))
 
 (defn init []
   (init-scene))
@@ -174,3 +236,13 @@
 (defn ^:dev/after-load reload []
   (init-scene))
 
+
+(comment
+  (let [a (array)]
+    (.push a 1)
+    (.push a 2)
+    (.push a 3)
+    (aset a 1 nil)
+    (.push a 4)
+    (js/console.log a))
+  (swap! state assoc :wall-width 10))

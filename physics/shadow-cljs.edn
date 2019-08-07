@@ -3,7 +3,7 @@
  ["src"]
 
  :dependencies
- [[cider/cider-nrepl "0.20.0"]
+ [[cider/cider-nrepl "0.21.1"]
   [org.clojure/core.async "0.4.490"]
   [doughamil/threeagent "0.0.2-SNAPSHOT"]]
 

@@ -6,7 +6,7 @@
 
 (instanced-mesh three) ;; Path three.js with instanced-mesh library
 
-(def ^:private ^:dynamic *idx* 0)
+(defonce ^:private last-idx (atom 0))
 (defonce ^:private temp-quat (three/Quaternion.))
 (defonce ^:private temp-vec (three/Vector3.))
 
@@ -21,8 +21,11 @@
 
 (defcomponent :instanced-box [{:keys [color]}]
   (let [o (three/Object3D.)
-        idx *idx*]
-    (set! *idx* (inc idx))
+        idx @last-idx]
+    (swap! last-idx inc)
+    (.addEventListener o "on-removed" (fn []
+                                        (.set temp-vec 0 0 0)
+                                        (.setScaleAt *boxes* idx temp-vec)))
     (.addEventListener o "on-added" (fn []
                                       (.updateWorldMatrix o true false)
                                       (.getWorldScale o temp-vec)
@@ -37,10 +40,10 @@
     o))
 
 (defn init-scene! [scene]
-  (set! *idx* 0)
   (.add scene *boxes*))
 
 (defn init! []
+  (reset! last-idx 0)
   (when-let [b *boxes*]
     (.remove (.-parent b) b))
   (set! *boxes* (three/InstancedMesh. (three/BoxBufferGeometry. 1 1 1 1 1 1)
@@ -51,3 +54,6 @@
                                       false))
   (set! (.-castShadow *boxes*) true)
   (set! (.-receiveShadow *boxes*) true))
+
+(comment
+  (println last-idx))

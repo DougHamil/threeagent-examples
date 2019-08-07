@@ -39,6 +39,12 @@
     (.addRigidBody world b)
     (.push *bodies* b)))
 
+(defn on-remove-body [^js a ^js world ^js evt]
+  (let [idx ^js (.. evt -idx)
+        b (aget *bodies* idx)]
+    (.removeRigidBody world b)
+    (aset *bodies* idx nil)))
+
 (defn start-simulation []
   (let [a *ammo*
         world  ^js (ammo/world a)
@@ -54,6 +60,8 @@
     (case t
       "add-body"
       (on-add-body *ammo* *world* (.. evt -data))
+      "remove-body"
+      (on-remove-body *ammo* *world* (.. evt -data))
       "reset"
       (start-simulation))))
 

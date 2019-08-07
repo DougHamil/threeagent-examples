@@ -52,7 +52,7 @@
                 (or (.-restitution cfg) 0))))
 
 (defn ground [^js a]
-  (let [shape ^js (box-shape a 50 0.1 50)
+  (let [shape ^js (box-shape a 50 0.001 50)
         t ^js (transform a)]
     (.setIdentity t)
     (.setOrigin t (vec3 a 0 0 0))
