@@ -14,7 +14,7 @@
     "postprocessing": "^6.2.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "three": "^0.103.0",
+    "three": "^0.125.0",
     "three-gltf-loader": "^1.103.0",
     "three-instanced-mesh": "^0.96.2"
   }
